@@ -30,15 +30,26 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core.apps.CoreConfig',
 ]
+
+INTERNAL_APPS = [
+    'accounts.apps.AccountsConfig',
+    'admin_panel.apps.AdminPanelConfig',
+    'artist.apps.ArtistConfig',
+    'core.apps.CoreConfig',
+    'gallery.apps.GalleryConfig',
+]
+
+EXTERNAL_APPS = []
+
+INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
