@@ -43,3 +43,25 @@ class Artwork(models.Model):
 
     def __str__(self) -> str:
         return f"[{self.artist.name}] {self.title}"
+
+
+class Exhibition(models.Model):
+    artist = models.ForeignKey(ArtistProfile, on_delete=models.PROTECT, related_name="exhibitions", db_index=True)
+    title = models.CharField(max_length=64)
+    start_date = models.DateField(db_index=True)
+    end_date = models.DateField(db_index=True)
+    artworks = models.ManyToManyField(Artwork, related_name="exhibitions", blank=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-start_date", "-created_at"]
+        indexes = [
+            models.Index(fields=["artist", "-start_date"], name="exhibitions_by_artist_recent"),
+        ]
+
+    def clean(self):
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValidationError({"end_date": "종료일은 시작일보다 빠를 수 없습니다."})
+
+    def __str__(self) -> str:
+        return f"[{self.artist.name}] {self.title}"
