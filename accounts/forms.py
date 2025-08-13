@@ -47,5 +47,14 @@ class EmailAuthenticationForm(AuthenticationForm):
         })
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password"].label = "비밀번호"
+        self.fields["password"].widget = forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "비밀번호",
+            "autocomplete": "current-password",
+        })
+
     def clean_username(self):
         return self.cleaned_data["username"].strip().lower()
