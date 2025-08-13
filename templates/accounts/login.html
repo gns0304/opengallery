@@ -1,27 +1,44 @@
-<!doctype html>
-<html lang="ko">
-  <head><meta charset="utf-8"><title>로그인</title></head>
-  <body>
-    <h1>로그인</h1>
+{% extends "common/base.html" %}
+{% block title %} - 로그인{% endblock %}
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {{ form.non_field_errors }}
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+  <div class="card border rounded-0 shadow-0">
+    <div class="card-body p-4">
+      <h1 class="h4 text-center form-title mb-4">로그인</h1>
 
-      <p>
-        {{ form.username.label_tag }}<br>
-        {{ form.username }}<br>
-        {{ form.username.errors }}
-      </p>
-      <p>
-        {{ form.password.label_tag }}<br>
-        {{ form.password }}<br>
-        {{ form.password.errors }}
-      </p>
+      <form method="post" novalidate>
+        {% csrf_token %}
 
-      <button type="submit">로그인</button>
-    </form>
+        <div class="mb-3">
+          <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+          {% endif %}
+        </div>
 
-    <p>처음이신가요? <a href="{% url 'accounts:signup' %}">회원가입</a></p>
-  </body>
-</html>
+        <div class="mb-3">
+          <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+          {% endif %}
+        </div>
+          {% if form.non_field_errors %}
+          <div class="text-danger small mt-1">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        <button type="submit" class="btn-submit rounded-0 btn btn-dark w-100">로그인</button>
+      </form>
+
+      <div class="text-center mt-4">
+        <small class="text-muted">처음이신가요?
+          <a href="{% url 'accounts:signup' %}" class="link-secondary ms-1">회원가입</a>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
