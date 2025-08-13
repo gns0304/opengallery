@@ -17,6 +17,18 @@
 <body class="bg-light">
   {% include "common/header.html" %}
   <main class="container py-4">
+
+      {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert rounded-0" role="alert">
+            {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
   </main>
 
