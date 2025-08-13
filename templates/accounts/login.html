@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+  <head><meta charset="utf-8"><title>로그인</title></head>
+  <body>
+    <h1>로그인</h1>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <p>
+        {{ form.username.label_tag }}<br>
+        {{ form.username }}<br>
+        {{ form.username.errors }}
+      </p>
+      <p>
+        {{ form.password.label_tag }}<br>
+        {{ form.password }}<br>
+        {{ form.password.errors }}
+      </p>
+
+      <button type="submit">로그인</button>
+    </form>
+
+    <p>처음이신가요? <a href="{% url 'accounts:signup' %}">회원가입</a></p>
+  </body>
+</html>
