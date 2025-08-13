@@ -1,0 +1,41 @@
+{% load static %}
+<header class="border-bottom bg-white header-shadow">
+  <nav class="navbar navbar-expand-lg container navbar-padding" aria-label="주요 메뉴">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:main' %}">
+        <img src="{% static 'img/logo_black.svg' %}" alt="OpenGallery">
+    </a>
+
+    <button class="navbar-toggler no-border" type="button"
+            data-bs-toggle="offcanvas" data-bs-target="#siteMenu"
+            aria-controls="siteMenu" aria-label="메뉴 열기">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="">작품보기</a></li>
+        <li class="nav-item"><a class="nav-link" href="">렌탈하기</a></li>
+        <li class="nav-item"><a class="nav-link" href="">이용후기</a></li>
+        <li class="nav-item"><a class="nav-link" href="">작가</a></li>
+        <li class="nav-item"><a class="nav-link" href="">큐레이터추천</a></li>
+        <li class="nav-item"><a class="nav-link" href="">아트매거진</a></li>
+      </ul>
+
+      <ul class="navbar-nav align-items-center gap-2">
+        {% if user.is_authenticated %}
+         <li class="nav-item">
+            <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="nav-link">로그아웃</button>
+            </form>
+        </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">로그인</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:signup' %}">회원가입</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  {% include "common/menu.html" %}
+</header>
