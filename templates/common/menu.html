@@ -1,0 +1,36 @@
+<div class="offcanvas offcanvas-start" tabindex="-1" id="siteMenu" aria-labelledby="siteMenuLabel">
+  <div class="offcanvas-header">
+    <h2 class="offcanvas-title h5" id="siteMenuLabel">메뉴</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="닫기"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column">
+    <ul class="list-unstyled mb-4">
+      <li><a class="d-block py-2 link-dark fw-semibold" href="{% url 'core:main' %}">홈</a></li>
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'artworks:list' %}">작품보기</a></li>#}
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'rentals:guide' %}">렌탈하기</a></li>#}
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'reviews:list' %}">이용후기</a></li>#}
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'artists:list' %}">작가</a></li>#}
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'curations:list' %}">큐레이터추천</a></li>#}
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'magazine:list' %}">아트매거진</a></li>#}
+    </ul>
+
+    <hr>
+
+    <ul class="list-unstyled mb-4">
+{#      <li><a class="d-block py-2 link-dark" href="{% url 'accounts:dashboard' %}">마이페이지</a></li>#}
+    </ul>
+
+    <div class="mt-auto d-grid gap-2">
+      {% if user.is_authenticated %}
+          <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-secondary">로그아웃</button>
+          </form>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'accounts:signup' %}">회원가입</a>
+        <a class="btn btn-outline-secondary" href="{% url 'accounts:login' %}">로그인</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

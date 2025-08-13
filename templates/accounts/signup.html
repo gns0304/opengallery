@@ -1,32 +1,52 @@
-<!doctype html>
-<html lang="ko">
-  <head><meta charset="utf-8"><title>회원가입</title></head>
-  <body>
-    <h1>회원가입</h1>
+{% extends "common/base.html" %}
+{% block title %} - 회원가입{% endblock %}
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {{ form.non_field_errors }}
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+  <div class="card border rounded-0 shadow-0">
+    <div class="card-body p-4">
+      <h1 class="h4 text-center mb-4 form-title">회원가입</h1>
 
-      <p>
-        {{ form.email.label_tag }}<br>
-        {{ form.email }}<br>
-        {{ form.email.errors }}
-      </p>
-      <p>
-        {{ form.password1.label_tag }}<br>
-        {{ form.password1 }}<br>
-        {{ form.password1.errors }}
-      </p>
-      <p>
-        {{ form.password2.label_tag }}<br>
-        {{ form.password2 }}<br>
-        {{ form.password2.errors }}
-      </p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+          {% endif %}
+        </div>
 
-      <button type="submit">가입</button>
-    </form>
+        <div class="mb-3">
+          <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+          {% endif %}
+        </div>
 
-    <p>이미 계정이 있으신가요? <a href="{% url 'accounts:login' %}">로그인</a></p>
-  </body>
-</html>
+        <div class="mb-3">
+          <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+          {% endif %}
+        </div>
+          {% if form.non_field_errors %}
+          <div class="text-danger small mt-1">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <button type="submit" class="btn-submit rounded-0 btn btn-dark w-100">회원가입</button>
+      </form>
+
+      <div class="text-center mt-4">
+        <small class="text-muted">이미 계정이 있으신가요?
+          <a href="{% url 'accounts:login' %}" class="link-secondary ms-1">로그인</a>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
