@@ -1,0 +1,93 @@
+{% extends "common/base.html" %}
+{% block title %} - 작가 등록 신청{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 720px;">
+  <div class="card border rounded-0 shadow-0">
+    <div class="card-body p-4">
+      <h1 class="h4 text-center form-title mb-4">작가 등록 신청</h1>
+
+      <form id="artist-apply-form" method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.gender.id_for_label }}">{{ form.gender.label }}</label>
+          {{ form.gender }}
+          {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+          {{ form.birth_date }}
+          {% if form.birth_date.errors %}<div class="text-danger small mt-1">{{ form.birth_date.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="mb-1">
+          <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit rounded-0 btn btn-dark w-100">신청하기</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+(function() {
+  const form = document.getElementById('artist-apply-form');
+  const phoneRe = /^\d{3}-\d{3,4}-\d{4}$/;
+
+  form.addEventListener('submit', function(e) {
+    const name = form.querySelector('input[name="name"]');
+    const gender = form.querySelector('select[name="gender"]');
+    const birth = form.querySelector('input[name="birth_date"]');
+    const email = form.querySelector('input[name="email"]');
+    const phone = form.querySelector('input[name="phone"]');
+
+    const errs = [];
+
+    if (!name.value || name.value.length > 16) {
+      errs.push("이름은 1~16자로 입력해주세요.");
+    }
+    if (!gender.value || (gender.value !== "M" && gender.value !== "F")) {
+        errs.push("성별은 '남자' 또는 '여자'를 선택해주세요.");
+    }
+    if (!birth.value || !/^\d{4}-\d{2}-\d{2}$/.test(birth.value)) {
+      errs.push("생년월일은 YYYY-MM-DD 형식으로 입력해주세요.");
+    }
+    if (!email.value) {
+      errs.push("이메일을 입력해주세요.");
+    } else {
+      const ok = email.checkValidity ? email.checkValidity() : /\S+@\S+\.\S+/.test(email.value);
+      if (!ok) errs.push("올바른 이메일 형식이 아닙니다.");
+    }
+    if (!phoneRe.test(phone.value)) {
+      errs.push("연락처 형식이 올바르지 않습니다. 예: 010-1234-5678");
+    }
+
+    if (errs.length) {
+      e.preventDefault();
+      alert(errs.join("\n"));
+    }
+  }, false);
+})();
+</script>
+
+{% endblock %}

@@ -52,3 +52,23 @@ form button {
     font-size: 12px;
     color: #989898;
 }
+
+.alert {
+    background-color: rgb(195, 168, 116) !important;
+    color: white !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alert .btn-close {
+    margin-left: auto;
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 1;
+}
+
+.alert .btn-close:focus,
+.alert .btn-close:active {
+    outline: none;
+    box-shadow: none;
+}
