@@ -71,7 +71,7 @@ class DashboardView(LoginRequiredMixin, AdminOnlyMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pending = ArtistApplication.objects.filter(status="pending").count()
+        pending = ArtistApplication.objects.filter(status="PENDING").count()
 
         context.update({
             "admin_email": getattr(self.request.user, "email", ""),
