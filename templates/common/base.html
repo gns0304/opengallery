@@ -9,41 +9,36 @@
         그림렌탈 1위 오픈갤러리{% block title %}{% endblock %}
     </title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <!-- Base CSS -->
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+          rel="stylesheet">
 </head>
-<body class="bg-light">
-  {% include "common/header.html" %}
-  <main class="container py-4">
+<body class="{% block body_class %}{% endblock %}">
 
-      {% if messages %}
-      <div class="container mt-3">
-        {% for message in messages %}
-          <div class="alert rounded-0" role="alert">
-            {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+{% include "common/header.html" %}
 
+<main class="container py-5">
+    {% include "common/message.html" %}
     {% block content %}{% endblock %}
-  </main>
+</main>
 
-  <footer class="border-top py-4 text-center text-muted small">
+<footer class="border-top py-4 text-center text-muted small">
     © OpenGallery
-  </footer>
+</footer>
 
-  <noscript>
+<noscript>
     <div class="alert alert-warning text-center m-0 rounded-0">
-      이 사이트를 정상적으로 사용하기 위해서는 JavaScript가 필요합니다. 브라우저 설정에서 JavaScript를 활성화하세요.
+        이 사이트를 정상적으로 사용하기 위해서는 JavaScript가 필요합니다. 브라우저 설정에서 JavaScript를 활성화하세요.
     </div>
-  </noscript>
+</noscript>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  {% block javascript %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+{% block javascript %}{% endblock %}
 </body>
 </html>

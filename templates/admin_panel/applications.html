@@ -1,0 +1,71 @@
+
+{% extends "common/layout/content_with_sidebar.html" %}
+
+{% block title %} - 작가 등록 신청 내역{% endblock %}
+{% block page_title %}작가 등록 신청 내역{% endblock %}
+
+{% block sidebar %}
+  {% include "admin_panel/sidebar.html" %}
+{% endblock %}
+
+{% block main %}
+
+<form method="post" action="{% url 'admin_panel:application_process' %}">
+    {% csrf_token %}
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>ID</th>
+                <th>이름</th>
+                <th>성별</th>
+                <th>생년월일</th>
+                <th>이메일</th>
+                <th>연락처</th>
+                <th>상태</th>
+                <th>신청일</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>
+                    {% if app.status in "PENDING,ERROR" %}
+                        <input type="checkbox" name="selected" value="{{ app.id }}">
+                    {% endif %}
+                </td>
+                <td>{{ app.id }}</td>
+                <td>{{ app.name }}</td>
+                <td>{{ app.gender }}</td>
+                <td>{{ app.birth_date }}</td>
+                <td>{{ app.email }}</td>
+                <td>{{ app.phone }}</td>
+                <td>{{ app.status }}</td>
+                <td>{{ app.submitted_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9">신청 내역이 없습니다.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 10px;">
+        <select name="action" required>
+            <option value="">작업 선택</option>
+            <option value="approve">승인</option>
+            <option value="reject">반려</option>
+        </select>
+        <button type="submit">선택 항목 처리</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('select-all').addEventListener('change', function(e) {
+        document.querySelectorAll('input[name="selected"]').forEach(cb => {
+            cb.checked = e.target.checked;
+        });
+    });
+</script>
+{% endblock %}

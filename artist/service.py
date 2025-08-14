@@ -8,9 +8,10 @@ class ProcessResult:
         self.approved = []
         self.skipped = []
         self.failed = []
+        self.rejected = []
 
 
-def process_single_application(application: ArtistApplication, admin_user):
+def process_single_application(application, admin_user):
     with transaction.atomic():
         application = (ArtistApplication.objects.select_for_update().select_related('applicant').get(pk=application.pk))
 
@@ -50,6 +51,7 @@ def process_single_application(application: ArtistApplication, admin_user):
 
 def process_multiple_approve(application_ids, admin_user):
     result = ProcessResult()
+    application_ids = [int(x) for x in application_ids]
     for app in ArtistApplication.objects.filter(pk__in=application_ids).only("id"):
         try:
             return_message = process_single_application(app, admin_user)
@@ -67,4 +69,22 @@ def process_multiple_approve(application_ids, admin_user):
                 status="ERROR", last_error_message=f"Error: {e}"
             )
             result.failed.append(app.id)
+    return result
+
+def process_multiple_reject(application_ids, admin_user):
+    result = ProcessResult()
+    application_ids = [int(x) for x in application_ids]
+
+    with transaction.atomic():
+        applications = (ArtistApplication.objects.select_for_update().filter(pk__in=application_ids,
+                                                                             status__in=["PENDING", "ERROR"]))
+    processed = list(applications.values_list('id', flat=True))
+    applications.update(
+        status="REJECTED",
+        processed_by=admin_user,
+        processed_at=timezone.now(),
+    )
+
+    result.rejected.extend(processed)
+    result.skipped.extend(set(application_ids) - set(processed))
     return result

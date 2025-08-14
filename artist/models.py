@@ -27,7 +27,7 @@ class ArtistProfile(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} ({self.user.username})"
+        return f"{self.name} ({self.user.email})"
 
 class ArtistApplication(models.Model):
     STATUS_CHOICES = (("PENDING", "대기"), ("PROCESSING", "처리중"), ("APPROVED", "승인"), ("REJECTED", "반려"),
@@ -57,8 +57,11 @@ class ArtistApplication(models.Model):
     class Meta:
         ordering = ["-submitted_at", "-id"]
         indexes = [models.Index(fields=["status", "-submitted_at", "-id"])]
-        constraints = [UniqueConstraint(fields=["applicant"], condition=Q(status__in=["PENDING", "ERROR"]),
-                                        name="unique_artist_application")]
+        constraints = [
+            UniqueConstraint(fields=["applicant"], condition=~Q(status="REJECTED"),
+                             name="unique_applicant_without_rejected",
+                             )
+        ]
 
     def __str__(self):
         return f"{self.name} / {self.get_status_display()}"

@@ -1,0 +1,61 @@
+{% extends "common/layout/content_with_sidebar.html" %}
+
+{% block title %} - 대시보드{% endblock %}
+{% block sidebar %}
+  {% include "admin_panel/sidebar.html" %}
+{% endblock %}
+
+
+{% block page_title %}대시보드{% endblock %}
+
+{% block main %}
+<div class="row g-3 align-items-stretch">
+
+  <div class="col-12 col-lg-5">
+    <div class="p-4 rounded-4 h-100" style="background:#1f1f1f; color:#fff;">
+      <div class="d-flex align-items-center gap-3">
+        <div>
+          <div class="fw-bold fs-4">관리자</div>
+          <div class="text-white-50">{{ admin_email }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-7 d-flex flex-column h-100">
+
+    <div class="p-4 rounded-4 mb-3 flex-fill" style="background:#f4f4f4;">
+      <div class="text-muted mb-3">작가 통계</div>
+      <div class="row text-center g-3">
+        <div class="col-4">
+          <div class="fs-2 fw-bold">{{ rental_count }}</div>
+          <div class="small">그림렌탈</div>
+        </div>
+        <div class="col-4">
+          <div class="fs-2 fw-bold">{{ purchase_count }}</div>
+          <div class="small">그림구매</div>
+        </div>
+        <div class="col-4">
+          <div class="fs-2 fw-bold">{{ arttech_count }}</div>
+          <div class="small">아트테크</div>
+        </div>
+      </div>
+    </div>
+
+<a href="{% url 'admin_panel:applications' %}"
+   class="p-4 rounded-4 flex-fill text-decoration-none"
+   style="background:#f4f4f4; color:inherit; display:block;">
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <span class="fw-semibold">신규 작가 등록 신청</span>
+    </div>
+    <div class="fs-4 fw-bold">
+      {{ pending_applications }} <span class="small">건</span>
+    </div>
+  </div>
+</a>
+
+  </div>
+
+</div>
+{% endblock %}
