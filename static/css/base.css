@@ -8,6 +8,10 @@ form button {
     font-weight: 300;
 }
 
+body {
+    padding-top: 80px;
+}
+
 .header-shadow {
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.06);
 }
@@ -72,3 +76,6 @@ form button {
     outline: none;
     box-shadow: none;
 }
+
+.admin-sidebar .list-group-item { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
+.admin-sidebar a.fw-semibold { color:#000; }

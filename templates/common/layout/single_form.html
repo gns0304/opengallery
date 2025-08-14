@@ -1,0 +1,24 @@
+{% extends "common/base.html" %}
+{% block title %}{% if block.super %}{{ block.super }}{% endif %}{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block content %}
+    <div class="container py-5" style="max-width: 520px;">
+        <div class="card border rounded-0 shadow-0">
+            <div class="card-body p-4">
+                {% block form_title %}{% endblock %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% block form_fields %}{% endblock %}
+                    {% block form_non_field_errors %}{% endblock %}
+                    <button type="submit" class="btn-submit rounded-0 btn btn-dark w-100">
+                        {% block submit_label %}{% endblock %}
+                    </button>
+                </form>
+
+                {% block form_footer %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

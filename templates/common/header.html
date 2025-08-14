@@ -1,5 +1,5 @@
 {% load static %}
-<header class="border-bottom bg-white header-shadow">
+<header class="border-bottom bg-white header-shadow fixed-top">
   <nav class="navbar navbar-expand-lg container navbar-padding" aria-label="주요 메뉴">
     <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:main' %}">
         <img src="{% static 'img/logo_black.svg' %}" alt="OpenGallery">
@@ -23,6 +23,11 @@
 
       <ul class="navbar-nav align-items-center gap-2">
         {% if user.is_authenticated %}
+            {% if user.is_staff %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_panel:dashboard' %}">관리자페이지</a>
+      </li>
+    {% endif %}
          <li class="nav-item">
             <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
                 {% csrf_token %}
