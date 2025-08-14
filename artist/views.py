@@ -29,10 +29,10 @@ class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
             return redirect("core:main")
 
         pending_exists = ArtistApplication.objects.filter(
-            applicant=request.user, status="PENDING"
+            applicant=request.user, status__in=["PENDING", "ERROR", "PROCESSING"]
         ).exists()
         if pending_exists and request.method.lower() == "get":
-            messages.info(request, "이미 접수된 작가 등록 신청이 있습니다. 결과를 기다려주세요.")
+            messages.info(request, "기접수된 작가 등록 신청이 있습니다.")
             return redirect("core:main")
 
         return super().dispatch(request, *args, **kwargs)
