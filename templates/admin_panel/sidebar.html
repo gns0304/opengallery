@@ -1,9 +1,32 @@
-<nav class="admin-sidebar">
+<div class="dropdown d-lg-none mb-3">
+    <button class="btn btn-outline-dark w-100 dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        관리자페이지
+    </button>
+    <ul class="dropdown-menu w-100">
+        <li>
+            <a class="dropdown-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+               href="{% url 'admin_panel:dashboard' %}">
+                대시보드
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item {% if request.resolver_match.url_name == 'applications' %}active{% endif %}"
+               href="{% url 'admin_panel:applications' %}">
+                작가 등록 신청 내역
+            </a>
+        </li>
+    </ul>
+</div>
+
+<nav class="admin-sidebar d-none d-lg-block">
     <div class="mb-5">
         <div class="h4 mb-0 fw-bold">관리자페이지</div>
     </div>
     <ul class="list-group list-group-flush rounded-0">
-    <li class="list-group-item px-0 border-0">
+        <li class="list-group-item px-0 border-0">
             <a href="{% url 'admin_panel:dashboard' %}"
                class="d-flex justify-content-between align-items-center link-dark text-decoration-none
                 {% if request.resolver_match.url_name == 'dashboard' %}fw-semibold{% endif %}">

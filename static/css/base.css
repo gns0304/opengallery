@@ -79,3 +79,26 @@ body {
 
 .admin-sidebar .list-group-item { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
 .admin-sidebar a.fw-semibold { color:#000; }
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:active,
+.dropdown-menu .dropdown-submenu .dropdown-item.active,
+.dropdown-menu .dropdown-submenu .dropdown-item:active {
+    background-color: #212529 !important;
+    color: #fff !important;
+}
+
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu .dropdown-submenu .dropdown-item:hover,
+.dropdown-menu .dropdown-submenu .dropdown-item:focus {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.dropdown-menu .active > a,
+.dropdown-menu .active > button {
+    background-color: #212529 !important;
+    color: #fff !important;
+}
