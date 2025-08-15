@@ -1,0 +1,98 @@
+{% extends "common/layout/content_with_sidebar.html" %}
+
+{% block title %} - 작품 등록{% endblock %}
+{% block page_title %}작품 등록{% endblock %}
+
+{% block sidebar %}
+    {% include "artist/sidebar.html" %}
+{% endblock %}
+
+{% block main %}
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="{{ form.title.id_for_label }}" class="form-label">작품 제목</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="invalid-feedback d-block">{{ form.title.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="price-display" class="form-label">작품 가격</label>
+                <input type="text" id="price-display" class="form-control" inputmode="numeric"
+                       placeholder="작품 가격">
+
+                <div class="d-none">
+                    {{ form.price }}
+                </div>
+                {% if form.price.errors %}
+                    <div class="invalid-feedback d-block">{{ form.price.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="{{ form.size.id_for_label }}" class="form-label">작품 호수</label>
+                {{ form.size }}
+                {% if form.size.errors %}
+                    <div class="invalid-feedback d-block">{{ form.size.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            {% if form.image %}
+                <div class="col-12">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">작품 이미지</label>
+                    {{ form.image }}
+                    <small class="text-muted d-block">허용된 확장자(.jpg, .jpeg, .png)와 최대 2MB 이하의 파일만 업로드할 수 있습니다.</small>
+                    {% if form.image.errors %}
+                        <div class="invalid-feedback d-block">{{ form.image.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">등록</button>
+            <a class="btn btn-outline-secondary" href="{% url 'artist:dashboard' %}">취소</a>
+        </div>
+    </form>
+
+    <script>
+        (function () {
+            const display = document.getElementById('price-display');
+            const real = document.getElementById('price-input');
+
+            function setInitial() {
+                if (!display || !real) return;
+                const n = parseInt(real.value, 10);
+                display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
+            }
+
+            function syncFromDisplay() {
+                const digits = (display.value || '').replace(/[^\d]/g, '');
+
+                if (digits.length) {
+                    const n = parseInt(digits, 10);
+                    display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
+                    real.value = Number.isFinite(n) ? n : '';
+                } else {
+                    display.value = '';
+                    real.value = '';
+                }
+            }
+
+            if (display && real) {
+                setInitial();
+                display.addEventListener('input', syncFromDisplay);
+                display.addEventListener('blur', syncFromDisplay);
+                display.form && display.form.addEventListener('submit', syncFromDisplay);
+            }
+        })();
+    </script>
+{% endblock %}

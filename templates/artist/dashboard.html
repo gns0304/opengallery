@@ -1,0 +1,123 @@
+{% extends "common/layout/content_with_sidebar.html" %}
+
+{% block title %} - 대시보드{% endblock %}
+{% block sidebar %}
+    {% include "artist/sidebar.html" %}
+{% endblock %}
+
+{% block page_title %}대시보드{% endblock %}
+
+{% block main %}
+    <div class="row g-3 align-items-stretch">
+        <div class="col-12 col-lg-5">
+            <div class="p-4 rounded-4 h-100" style="background:#1f1f1f; color:#fff;">
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-baseline gap-2">
+                        <div class="fw-bold fs-4">{{ profile_name }}</div>
+                        <div class="text-white-50 small">{{ profile_birth_date }}</div>
+                    </div>
+                    <div class="text-white">{{ profile_email }}</div>
+                    <div class="text-white-50">{{ profile_phone }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+            <div class="p-4 rounded-4 h-100" style="background:#f4f4f4;">
+                <div class="text-muted mb-3">작가 통계</div>
+                <div class="row text-center g-3">
+                    <div class="col-6">
+                        <a href="{% url 'artist:artwork_apply' %}" class="text-decoration-none text-dark">
+                            <div class="fs-2 fw-bold">{{ artworks_count }}</div>
+                            <div class="small">작품 수</div>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'artist:exhibition_apply' %}" class="text-decoration-none text-dark">
+                            <div class="fs-2 fw-bold">{{ exhibitions_count }}</div>
+                            <div class="small">전시 수</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<h2 class="h5 mt-5 my-5">등록된 작품</h2>
+  {% if artworks %}
+    <div class="row g-3">
+      {% for art in artworks %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card h-100 border-0">
+            <div class="ratio ratio-4x3 overflow-hidden">
+              {% if art.image %}
+                <img src="{{ art.image.url }}" class="w-100 h-100 object-cover" alt="{{ art.title }}">
+              {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                  <span class="text-muted small">이미지 없음</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="card-body p-2">
+              <div class="fw-semibold text-truncate" title="{{ art.title }}">{{ art.title }}</div>
+              <div class="text-muted small mt-1">
+                  <span>{{ art.size }}호</span> |
+                  <span>작품가 <span class="price-commas" data-price="{{ art.price }}">{{ art.price }}</span>원</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-muted">등록된 작품이 없습니다. 상단 통계의 ‘작품 수’를 눌러 작품을 등록해 보세요. <a href="{% url 'artist:artwork_apply' %}">작품을 등록</a>해보세요.</div></div>
+  {% endif %}
+
+
+  <h2 class="h5 mt-5 my-5">등록된 전시</h2>
+  {% if exhibitions %}
+    <div class="row g-3">
+      {% for ex in exhibitions %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card h-100 border-0">
+            <div class="ratio ratio-4x3 overflow-hidden">
+              {% if ex.image %}
+                <img src="{{ ex.image.url }}" class="w-100 h-100 object-cover" alt="{{ ex.title }}">
+              {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                  <span class="text-muted small">이미지 없음</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="card-body p-2">
+              <div class="fw-semibold text-truncate" title="{{ ex.title }}">{{ ex.title }}</div>
+              <div class="text-muted small mt-1">
+                {{ ex.start_date|date:"Y.m.d" }} ~ {{ ex.end_date|date:"Y.m.d" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+  <div class="text-muted">등록된 전시가 없습니다. <a href="{% url 'artist:exhibition_apply' %}">전시를 등록</a>해보세요.</div>
+  {% endif %}
+
+
+
+<style>
+  .object-cover { object-fit: cover; object-position: center; }
+</style>
+
+<script>
+  (function () {
+    document.querySelectorAll('.price-commas').forEach(el => {
+      const raw = el.getAttribute('data-price') || el.textContent;
+      const n = parseInt(String(raw).replace(/[^\d]/g, ''), 10);
+      el.textContent = Number.isFinite(n) ? n.toLocaleString('ko-KR') : raw;
+    });
+  })();
+</script>
+
+{% endblock %}

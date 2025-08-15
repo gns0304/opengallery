@@ -102,3 +102,4 @@ body {
     background-color: #212529 !important;
     color: #fff !important;
 }
+.object-cover { object-fit: cover; object-position: center; }

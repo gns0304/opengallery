@@ -7,19 +7,24 @@ from pathlib import Path
 from artist.models import ArtistProfile
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+ALLOWED_SIZE_MB = 2
 
 def validate_image_ext(f):
     ext = Path((getattr(f, "name", "") or "")).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise ValidationError("지원하지 않는 이미지 형식입니다.")
 
-def validate_image_size(f, max_mb=5):
-    if getattr(f, "size", 0) > max_mb * 1024 * 1024:
+def validate_image_size(f):
+    if getattr(f, "size", 0) > ALLOWED_SIZE_MB * 1024 * 1024:
         raise ValidationError("이미지 크기가 너무 큽니다.")
 
 def artwork_upload_to(instance, filename):
     ext = Path(filename).suffix.lower()
     return f"artworks/A{instance.artist_id}/{uuid4().hex[:8]}{ext}"
+
+def exhibition_upload_to(instance, filename):
+    ext = Path(filename).suffix.lower()
+    return f"exhibitions/A{instance.artist_id}/{uuid4().hex[:8]}{ext}"
 
 class Artwork(models.Model):
     artist = models.ForeignKey(ArtistProfile, on_delete=models.PROTECT, related_name='artworks', db_index=True)
@@ -52,6 +57,8 @@ class Exhibition(models.Model):
     end_date = models.DateField(db_index=True)
     artworks = models.ManyToManyField(Artwork, related_name="exhibitions", blank=False)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    image = models.ImageField(upload_to=exhibition_upload_to, blank=True, null=True,
+                                  validators=[validate_image_ext, validate_image_size])
 
     class Meta:
         ordering = ["-start_date", "-created_at"]

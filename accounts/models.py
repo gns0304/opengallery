@@ -40,3 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    @property
+    def is_approved_artist(self):
+        profile = getattr(self, "artistprofile", None)
+        return bool(profile and profile.is_approved)

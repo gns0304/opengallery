@@ -1,0 +1,143 @@
+{% extends "common/layout/content_with_sidebar.html" %}
+
+{% block title %} - 전시 등록{% endblock %}
+{% block page_title %}전시 등록{% endblock %}
+
+{% block sidebar %}
+    {% include "artist/sidebar.html" %}
+{% endblock %}
+
+{% block main %}
+    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-warning">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="{{ form.title.id_for_label }}" class="form-label">전시 제목</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="invalid-feedback d-block">{{ form.title.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="{{ form.start_date.id_for_label }}" class="form-label">전시 시작일</label>
+                {{ form.start_date }}
+                {% if form.start_date.errors %}
+                    <div class="invalid-feedback d-block">{{ form.start_date.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="{{ form.end_date.id_for_label }}" class="form-label">전시 종료일</label>
+                {{ form.end_date }}
+                {% if form.end_date.errors %}
+                    <div class="invalid-feedback d-block">{{ form.end_date.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+            {% if form.image %}
+                <div class="col-12">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">전시 이미지</label>
+                    {{ form.image }}
+                    <small class="text-muted d-block">이미지는 .jpg, .jpeg, .png 형식이며, 파일 크기는 2MB 이하여야 합니다.</small>
+                    {% if form.image.errors %}
+                        <div class="invalid-feedback d-block">{{ form.image.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="d-none">
+                {{ form.artworks }}
+            </div>
+
+            <div class="col-12">
+                <label class="form-label d-flex align-items-center gap-2">
+                    전시 작품 목록
+                    <small class="text-muted">(최소 1개 선택)</small>
+                </label>
+
+                {% if form.artworks.field.queryset %}
+                    <div class="row g-3" id="artworks-grid">
+                        {% for art in form.artworks.field.queryset %}
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <div class="card h-100">
+                                    <div class="ratio ratio-4x3">
+                                        {% if art.image %}
+                                            <img src="{{ art.image.url }}" class="w-100 h-100 object-cover"
+                                                 alt="{{ art.title }}">
+                                        {% else %}
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                                <span class="text-muted small">이미지 없음</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="card-body p-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input artwork-check"
+                                                   type="checkbox"
+                                                   value="{{ art.pk }}"
+                                                   id="art-{{ art.pk }}">
+                                            <label class="form-check-label d-block text-truncate"
+                                                   for="art-{{ art.pk }}">
+                                                {{ art.title }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-muted">표시할 작품이 없습니다. 먼저 작품을 등록해주세요.</div>
+                {% endif %}
+
+                {% if form.artworks.errors %}
+                    <div class="invalid-feedback d-block mt-2">{{ form.artworks.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">등록</button>
+            <a class="btn btn-outline-secondary" href="{% url 'artist:dashboard' %}">취소</a>
+        </div>
+    </form>
+
+    <script>
+        (function () {
+            const select = document.querySelector('select[name="{{ form.artworks.html_name }}"]');
+            const checks = Array.from(document.querySelectorAll('.artwork-check'));
+
+            if (!select) return;
+
+            function hydrateFromSelect() {
+                const selectedValues = new Set(Array.from(select.options).filter(o => o.selected).map(o => o.value));
+                checks.forEach(cb => {
+                    cb.checked = selectedValues.has(cb.value);
+                });
+            }
+
+            function syncToSelect() {
+                const chosen = new Set(checks.filter(cb => cb.checked).map(cb => cb.value));
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = chosen.has(opt.value);
+                });
+            }
+
+            hydrateFromSelect();
+
+            document.addEventListener('change', (e) => {
+                if (e.target && e.target.classList && e.target.classList.contains('artwork-check')) {
+                    syncToSelect();
+                }
+            });
+
+            select.form && select.form.addEventListener('submit', syncToSelect);
+        })();
+    </script>
+{% endblock %}
