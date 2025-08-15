@@ -120,12 +120,14 @@ class DashboardView(ApprovedArtistRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ap = self.request.user.artistprofile
+        profile = self.request.user.artistprofile
 
         context.update({
-            "profile_name": getattr(ap, "name", self.request.user.get_username()),
-            "profile_email": getattr(self.request.user, "email", ""),
-            "artworks_count": Artwork.objects.filter(artist=ap).count(),
-            "exhibitions_count": Exhibition.objects.filter(artist=ap).count(),
+            "profile_name": getattr(profile, "name", self.request.user.get_username()),
+            "profile_email": getattr(profile, "email", self.request.user.email),
+            "profile_birth_date": getattr(profile, "birth_date", ""),
+            "profile_phone": getattr(profile, "phone", ""),
+            "artworks_count": Artwork.objects.filter(artist=profile).count(),
+            "exhibitions_count": Exhibition.objects.filter(artist=profile).count(),
         })
         return context
