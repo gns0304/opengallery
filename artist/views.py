@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 
 from artist.forms import ArtistApplicationForm
 from artist.models import ArtistApplication, ArtistProfile
-
+from gallery.models import Artwork, Exhibition
+from .forms import ArtworkCreateForm, ExhibitionCreateForm
 
 class ApprovedArtistRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     login_url = "accounts:login"
@@ -33,7 +34,7 @@ class ApprovedArtistRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 
 class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
-    template_name = "artist/apply.html"
+    template_name = "artist/artist_apply.html"
     form_class = ArtistApplicationForm
     success_url = reverse_lazy("core:main")
 
@@ -73,3 +74,58 @@ class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
 
         messages.success(self.request, "작가 등록 신청이 접수되었어요. 승인 결과를 기다려주세요.")
         return super().form_valid(form)
+
+
+class ArtworkCreateView(ApprovedArtistRequiredMixin, CreateView):
+    model = Artwork
+    form_class = ArtworkCreateForm
+    template_name = "artist/artwork_apply.html"
+    success_url = reverse_lazy("artist:artwork_apply")
+
+    def form_valid(self, form):
+        form.instance.artist = self.request.user.artistprofile
+        response = super().form_valid(form)
+        messages.success(self.request, "작품이 정상적으로 등록되었습니다.")
+        return response
+
+    def form_invalid(self, form):
+        messages.warning(self.request, "입력값을 확인해주세요.")
+        return super().form_invalid(form)
+
+
+class ExhibitionCreateView(ApprovedArtistRequiredMixin, CreateView):
+    model = Exhibition
+    form_class = ExhibitionCreateForm
+    template_name = "artist/exhibition_apply.html"
+    success_url = reverse_lazy("artist:exhibition_apply")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.artist = self.request.user.artistprofile
+        response = super().form_valid(form)
+        messages.success(self.request, "전시가 등록되었습니다.")
+        return response
+
+    def form_invalid(self, form):
+        messages.warning(self.request, "입력값을 확인해주세요.")
+        return super().form_invalid(form)
+
+
+class DashboardView(ApprovedArtistRequiredMixin, TemplateView):
+    template_name = "artist/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ap = self.request.user.artistprofile
+
+        context.update({
+            "profile_name": getattr(ap, "name", self.request.user.get_username()),
+            "profile_email": getattr(self.request.user, "email", ""),
+            "artworks_count": Artwork.objects.filter(artist=ap).count(),
+            "exhibitions_count": Exhibition.objects.filter(artist=ap).count(),
+        })
+        return context

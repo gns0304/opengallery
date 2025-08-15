@@ -58,14 +58,14 @@ class ArtworkCreateForm(forms.ModelForm):
                 "class": "form-control",
                 "min": 0,
                 "id": "price-input",
-                "placeholder": "숫자만 입력 (입력 중 콤마 표기 JS 가능)",
+                "placeholder": "숫자만 입력",
                 "inputmode": "numeric",
             }),
             "size": forms.NumberInput(attrs={
                 "class": "form-control",
                 "min": 1,
                 "max": 500,
-                "placeholder": "1 ~ 500",
+                "placeholder": "1 ~ 500까지의 호수",
                 "inputmode": "numeric",
             }),
         }
@@ -140,7 +140,10 @@ class ExhibitionCreateForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         if self.user is not None:
-            self.fields["artworks"].queryset = Artwork.objects.filter(owner=self.user).order_by("-id")
+            profile = getattr(self.user, "artistprofile", None)
+            self.fields["artworks"].queryset = (
+                Artwork.objects.filter(artist=profile).order_by("-id") if profile else Artwork.objects.none()
+            )
         else:
             self.fields["artworks"].queryset = Artwork.objects.none()
 
@@ -174,7 +177,9 @@ class ExhibitionCreateForm(forms.ModelForm):
         if not arts or len(arts) == 0:
             self.add_error("artworks", ValidationError("전시 작품을 최소 1개 이상 선택하세요."))
         else:
-            invalid_arts = arts.exclude(owner=self.user)
+            profile = getattr(self.user, "artistprofile", None)
+            invalid_arts = arts.exclude(artist=profile)
             if invalid_arts.exists():
                 self.add_error("artworks", ValidationError("본인 소유의 작품만 선택할 수 있습니다."))
+
         return cleaned
