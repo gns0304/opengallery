@@ -21,6 +21,10 @@ def artwork_upload_to(instance, filename):
     ext = Path(filename).suffix.lower()
     return f"artworks/A{instance.artist_id}/{uuid4().hex[:8]}{ext}"
 
+def exhibition_upload_to(instance, filename):
+    ext = Path(filename).suffix.lower()
+    return f"exhibitions/A{instance.artist_id}/{uuid4().hex[:8]}{ext}"
+
 class Artwork(models.Model):
     artist = models.ForeignKey(ArtistProfile, on_delete=models.PROTECT, related_name='artworks', db_index=True)
     title = models.CharField(max_length=64)
@@ -52,6 +56,8 @@ class Exhibition(models.Model):
     end_date = models.DateField(db_index=True)
     artworks = models.ManyToManyField(Artwork, related_name="exhibitions", blank=False)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    image = models.ImageField(upload_to=exhibition_upload_to, blank=True, null=True,
+                                  validators=[validate_image_ext, validate_image_size])
 
     class Meta:
         ordering = ["-start_date", "-created_at"]
