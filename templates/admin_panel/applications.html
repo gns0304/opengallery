@@ -10,7 +10,7 @@
 {% block main %}
     <form method="post" action="{% url 'admin_panel:application_process' %}" id="bulk-form">
         {% csrf_token %}
-
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
         <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center justify-content-between mb-3">
             <div class="d-flex flex-wrap gap-2">
                 <div class="btn-group btn-group-sm" role="group" aria-label="Bulk actions">
@@ -66,15 +66,15 @@
                         <td class="d-none d-xl-table-cell text-center">{{ app.phone }}</td>
                         <td class="text-center">
                             {% if app.status == "APPROVED" %}
-                                <span class="badge rounded-pill bg-success px-3 py-2">승인</span>
+                                <span class="badge rounded-pill bg-dark px-3 py-2">승인</span>
                             {% elif app.status == "REJECTED" %}
-                                <span class="badge rounded-pill bg-danger px-3 py-2">반려</span>
+                                <span class="badge rounded-pill bg-secondary px-3 py-2">반려</span>
                             {% elif app.status == "ERROR" %}
-                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">에러</span>
+                                <span class="badge rounded-pill bg-secondary text-dark px-3 py-2">에러</span>
                             {% elif app.status == "PROCESSING" %}
-                                <span class="badge rounded-pill bg-info text-dark px-3 py-2">처리중</span>
+                                <span class="badge rounded-pill bg-secondary text-dark px-3 py-2">처리중</span>
                             {% else %}
-                                <span class="badge rounded-pill bg-secondary px-3 py-2">대기</span>
+                                <span class="badge rounded-pill border border-dark bg-transparent text-dark px-3 py-2">대기</span>
                             {% endif %}
                         </td>
                         <td class="text-center">
@@ -90,6 +90,46 @@
             </table>
         </div>
     </form>
+
+    {% if is_paginated %}
+        <nav aria-label="Page navigation" class="my-4">
+            <ul class="pagination justify-content-center pagination-sm">
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link text-dark" href="?page={{ page_obj.previous_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                            이전
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link text-dark">이전</span></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    {% if num == page_obj.paginator.ELLIPSIS %}
+                        <li class="page-item disabled"><span class="page-link text-dark">&hellip;</span></li>
+                    {% elif num == page_obj.number %}
+                        <li class="page-item active"><span class="page-link bg-dark border-dark">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link text-dark" href="?page={{ num }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link text-dark" href="?page={{ page_obj.next_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                            다음
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link text-dark">다음</span></li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endif %}
 
     <script>
         (function () {

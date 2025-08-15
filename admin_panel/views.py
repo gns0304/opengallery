@@ -32,6 +32,12 @@ class ApplicationListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
         query = self.request.GET.copy()
         query.pop('page', None)
         context['preserved_query'] = query.urlencode()
+
+        context['page_range'] = context['paginator'].get_elided_page_range(
+            context['page_obj'].number,
+            on_each_side=1,
+            on_ends=1
+        )
         return context
 
 
