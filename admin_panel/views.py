@@ -3,10 +3,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, View, TemplateView
 from django.shortcuts import redirect, reverse
 
-from artist.models import ArtistApplication
+from artist.models import ArtistApplication, ArtistProfile
 from artist.service import process_multiple_approve, process_multiple_reject
-
-import re
+from django.db.models import Count, Avg, Max, Q, IntegerField, Min
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from datetime import timedelta
 
 
 class AdminOnlyMixin(UserPassesTestMixin):
@@ -30,7 +32,7 @@ class ApplicationListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
             .order_by("-submitted_at", "-id")
         )
 
-        field = self.request.GET.get("field", "").strip()
+        field = self.request.GET.get("field", "name").strip()
         query = self.request.GET.get("query", "").strip()
 
         if field and query:
@@ -119,9 +121,64 @@ class DashboardView(LoginRequiredMixin, AdminOnlyMixin, TemplateView):
 
         context.update({
             "admin_email": getattr(self.request.user, "email", ""),
-            "rental_count": 0,
-            "purchase_count": 0,
-            "arttech_count": 0,
+            "total_applications": ArtistApplication.objects.count(),
+            "approved_applications": ArtistApplication.objects.filter(status="APPROVED").count(),
+            "rejected_applications": ArtistApplication.objects.filter(status="REJECTED").count(),
             "pending_applications": pending,
         })
+        return context
+
+
+class ArtistStatsListView(ListView):
+    model = ArtistProfile
+    template_name = "admin_panel/artist_stats.html"
+    context_object_name = "artists"
+    paginate_by = 10
+
+    def get_queryset(self):
+
+        now = timezone.now()
+        field = self.request.GET.get("field", "name").strip()
+        query = self.request.GET.get("query", "").strip()
+        recent = now - timedelta(days=30)
+
+        queryset = ArtistProfile.objects.filter(is_approved=True)
+
+        if field == "name":
+            queryset = queryset.filter(name__icontains=query)
+
+        elif field == "email":
+            queryset = queryset.filter(email__icontains=query)
+
+        elif field == "phone":
+            queryset = queryset.filter(phone__icontains=query)
+        else:
+            messages.warning(self.request, "지원하지 않는 검색 필드입니다.")
+
+        queryset = (
+            queryset.annotate(
+                works_under_100_count=Count("artworks", filter=Q(artworks__size__lte=100), distinct=True,),
+                average_price=Coalesce(Avg("artworks__price"), 0, output_field=IntegerField()),
+                exhibitions_count=Count("exhibitions", distinct=True),
+                latest_apply_activity = Coalesce(Max("artworks__created_at"), Max("exhibitions__start_date")),
+                recent_works = Count("artworks",filter=Q(artworks__created_at__gte=recent),distinct=True),
+                min_price = Coalesce(Min("artworks__price"), 0, output_field=IntegerField()),
+                max_price = Coalesce(Max("artworks__price"), 0, output_field=IntegerField()),
+            ).order_by("-latest_apply_activity", "-id")
+        )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.copy()
+        query.pop('page', None)
+        context['preserved_query'] = query.urlencode()
+
+        context['page_range'] = context['paginator'].get_elided_page_range(
+            context['page_obj'].number,
+            on_each_side=1,
+            on_ends=1
+        )
+        context['selected_field'] = self.request.GET.get("field", "")
+        context['query'] = self.request.GET.get("query", "")
         return context

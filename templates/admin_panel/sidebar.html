@@ -18,6 +18,12 @@
                 작가 등록 신청 내역
             </a>
         </li>
+        <li>
+            <a class="dropdown-item {% if request.resolver_match.url_name == 'artist_stats' %}active{% endif %}"
+               href="{% url 'admin_panel:artist_stats' %}">
+                작가 통계
+            </a>
+        </li>
     </ul>
 </div>
 
@@ -39,6 +45,14 @@
                class="d-flex justify-content-between align-items-center link-dark text-decoration-none
                 {% if request.resolver_match.url_name == 'applications' %}fw-semibold{% endif %}">
                 <span>작가 등록 신청 내역</span>
+                <span class="bi bi-chevron-right small"></span>
+            </a>
+        </li>
+        <li class="list-group-item px-0 border-0">
+            <a href="{% url 'admin_panel:artist_stats' %}"
+               class="d-flex justify-content-between align-items-center link-dark text-decoration-none
+                {% if request.resolver_match.url_name == 'artist_stats' %}fw-semibold{% endif %}">
+                <span>작가 통계</span>
                 <span class="bi bi-chevron-right small"></span>
             </a>
         </li>
