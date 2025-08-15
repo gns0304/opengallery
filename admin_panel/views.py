@@ -6,6 +6,9 @@ from django.shortcuts import redirect, reverse
 from artist.models import ArtistApplication
 from artist.service import process_multiple_approve, process_multiple_reject
 
+import re
+
+
 class AdminOnlyMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_staff
@@ -21,11 +24,29 @@ class ApplicationListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return (
+        queryset =  (
             ArtistApplication.objects
             .select_related("applicant", "processed_by")
             .order_by("-submitted_at", "-id")
         )
+
+        field = self.request.GET.get("field", "").strip()
+        query = self.request.GET.get("query", "").strip()
+
+        if field and query:
+
+            if field == "name":
+                queryset = queryset.filter(name__icontains=query)
+
+            elif field == "email":
+                queryset = queryset.filter(email__icontains=query)
+
+            elif field == "phone":
+                queryset = queryset.filter(phone__icontains=query)
+            else:
+                messages.warning(self.request, "지원하지 않는 검색 필드입니다.")
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,6 +59,8 @@ class ApplicationListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
             on_each_side=1,
             on_ends=1
         )
+        context['selected_field'] = self.request.GET.get("field", "")
+        context['query'] = self.request.GET.get("query", "")
         return context
 
 
