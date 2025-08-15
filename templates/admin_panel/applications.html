@@ -1,71 +1,117 @@
-
 {% extends "common/layout/content_with_sidebar.html" %}
 
 {% block title %} - 작가 등록 신청 내역{% endblock %}
 {% block page_title %}작가 등록 신청 내역{% endblock %}
 
 {% block sidebar %}
-  {% include "admin_panel/sidebar.html" %}
+    {% include "admin_panel/sidebar.html" %}
 {% endblock %}
 
 {% block main %}
+    <form method="post" action="{% url 'admin_panel:application_process' %}" id="bulk-form">
+        {% csrf_token %}
 
-<form method="post" action="{% url 'admin_panel:application_process' %}">
-    {% csrf_token %}
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="select-all"></th>
-                <th>ID</th>
-                <th>이름</th>
-                <th>성별</th>
-                <th>생년월일</th>
-                <th>이메일</th>
-                <th>연락처</th>
-                <th>상태</th>
-                <th>신청일</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for app in applications %}
-            <tr>
-                <td>
-                    {% if app.status in "PENDING,ERROR" %}
-                        <input type="checkbox" name="selected" value="{{ app.id }}">
-                    {% endif %}
-                </td>
-                <td>{{ app.id }}</td>
-                <td>{{ app.name }}</td>
-                <td>{{ app.gender }}</td>
-                <td>{{ app.birth_date }}</td>
-                <td>{{ app.email }}</td>
-                <td>{{ app.phone }}</td>
-                <td>{{ app.status }}</td>
-                <td>{{ app.submitted_at|date:"Y-m-d H:i" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9">신청 내역이 없습니다.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center justify-content-between mb-3">
+            <div class="d-flex flex-wrap gap-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Bulk actions">
+                    <button class="btn btn-dark" name="action" value="approve" type="submit">선택 승인</button>
+                    <button class="btn btn-outline-dark" name="action" value="reject" type="submit">선택 반려</button>
+                </div>
+            </div>
+        </div>
 
-    <div style="margin-top: 10px;">
-        <select name="action" required>
-            <option value="">작업 선택</option>
-            <option value="approve">승인</option>
-            <option value="reject">반려</option>
-        </select>
-        <button type="submit">선택 항목 처리</button>
-    </div>
-</form>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 ">
+                <thead class="table-light position-sticky top-0 text-center" style="z-index:1;">
+                <tr>
+                    <th style="width:36px;">
+                        <input class="form-check-input" type="checkbox" id="select-all" aria-label="전체 선택">
+                    </th>
+                    <th class="text-nowrap">ID</th>
+                    <th class="text-nowrap">이름</th>
+                    <th class="text-nowrap d-none d-md-table-cell">성별</th>
+                    <th class="text-nowrap d-none d-lg-table-cell">생년월일</th>
+                    <th class="text-nowrap d-none d-lg-table-cell">이메일</th>
+                    <th class="text-nowrap d-none d-xl-table-cell">연락처</th>
+                    <th class="text-nowrap">상태</th>
+                    <th class="text-nowrap">신청일</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for app in applications %}
+                    <tr>
+                        <td>
+                            {% if app.status == "PENDING" or app.status == "ERROR" or app.status == "PROCESSING" %}
+                                <input
+                                        class="form-check-input row-select"
+                                        type="checkbox"
+                                        name="selected"
+                                        value="{{ app.id }}"
+                                        aria-label="선택">
+                            {% else %}
+                                <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        disabled
+                                        aria-label="선택">
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ app.id }}</td>
+                        <td class="fw-semibold">{{ app.name }}</td>
+                        <td class="d-none d-md-table-cell text-center">
+                            {% if app.gender == "M" %}남자{% elif app.gender == "F" %}여자{% else %}-{% endif %}
+                        </td>
+                        <td class="d-none d-lg-table-cell">{{ app.birth_date }}</td>
+                        <td class="d-none d-lg-table-cell">{{ app.email }}</td>
+                        <td class="d-none d-xl-table-cell text-center">{{ app.phone }}</td>
+                        <td class="text-center">
+                            {% if app.status == "APPROVED" %}
+                                <span class="badge rounded-pill bg-success px-3 py-2">승인</span>
+                            {% elif app.status == "REJECTED" %}
+                                <span class="badge rounded-pill bg-danger px-3 py-2">반려</span>
+                            {% elif app.status == "ERROR" %}
+                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">에러</span>
+                            {% elif app.status == "PROCESSING" %}
+                                <span class="badge rounded-pill bg-info text-dark px-3 py-2">처리중</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-secondary px-3 py-2">대기</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <time datetime="{{ app.submitted_at|date:'c' }}">{{ app.submitted_at|date:"Y-m-d H:i" }}</time>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">신청 내역이 없습니다.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
 
-<script>
-    document.getElementById('select-all').addEventListener('change', function(e) {
-        document.querySelectorAll('input[name="selected"]').forEach(cb => {
-            cb.checked = e.target.checked;
-        });
-    });
-</script>
+    <script>
+        (function () {
+            const selectAll = document.getElementById('select-all');
+            const enabledBoxes = () =>
+                Array.from(document.querySelectorAll('.row-select:not([disabled])'));
+
+            if (selectAll) {
+                selectAll.addEventListener('change', (e) => {
+                    enabledBoxes().forEach(cb => cb.checked = e.target.checked);
+                });
+            }
+
+            document.addEventListener('change', (e) => {
+                if (!e.target.classList.contains('row-select')) return;
+                const boxes = enabledBoxes();
+                if (boxes.length === 0) return;
+                const allChecked = boxes.every(cb => cb.checked);
+                const anyChecked = boxes.some(cb => cb.checked);
+                selectAll.indeterminate = !allChecked && anyChecked;
+                selectAll.checked = allChecked;
+            });
+        })();
+    </script>
 {% endblock %}
