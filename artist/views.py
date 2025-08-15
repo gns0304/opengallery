@@ -129,5 +129,7 @@ class DashboardView(ApprovedArtistRequiredMixin, TemplateView):
             "profile_phone": getattr(profile, "phone", ""),
             "artworks_count": Artwork.objects.filter(artist=profile).count(),
             "exhibitions_count": Exhibition.objects.filter(artist=profile).count(),
+            "artworks": Artwork.objects.filter(artist=profile).order_by("-id"),
+            "exhibitions": Exhibition.objects.filter(artist=profile).order_by("-start_date", "-id"),
         })
         return context
