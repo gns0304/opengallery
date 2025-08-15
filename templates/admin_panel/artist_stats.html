@@ -41,7 +41,7 @@
         <table class="table table-hover align-middle mb-0 ">
             <thead class="table-light position-sticky top-0 text-center" style="z-index:1;">
             <tr>
-                <th class="text-nowrap">ID</th>
+                <th class="text-nowrap text-end">ID</th>
                 <th class="text-nowrap">이름</th>
                 <th class="text-nowrap">100호 이하 작품 수</th>
                 <th class="text-nowrap">전시 수</th>
@@ -54,7 +54,7 @@
             <tbody>
             {% for a in artists %}
                 <tr class="text-center">
-                    <td class="d-none d-lg-table-cell text-start text-muted">{{ a.user.id }}</td>
+                    <td class="text-end">{{ a.user.id }}</td>
                     <td class="text-start fw-semibold">{{ a.name }}</td>
                     <td>{{ a.works_under_100_count|default:0 }}</td>
                     <td>{{ a.exhibitions_count|default:0 }}</td>
