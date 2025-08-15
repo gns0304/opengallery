@@ -7,14 +7,15 @@ from pathlib import Path
 from artist.models import ArtistProfile
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
+ALLOWED_SIZE_MB = 2
 
 def validate_image_ext(f):
     ext = Path((getattr(f, "name", "") or "")).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise ValidationError("지원하지 않는 이미지 형식입니다.")
 
-def validate_image_size(f, max_mb=5):
-    if getattr(f, "size", 0) > max_mb * 1024 * 1024:
+def validate_image_size(f):
+    if getattr(f, "size", 0) > ALLOWED_SIZE_MB * 1024 * 1024:
         raise ValidationError("이미지 크기가 너무 큽니다.")
 
 def artwork_upload_to(instance, filename):
