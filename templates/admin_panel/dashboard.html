@@ -25,19 +25,19 @@
   <div class="col-12 col-lg-7 d-flex flex-column h-100">
 
     <div class="p-4 rounded-4 mb-3 flex-fill" style="background:#f4f4f4;">
-      <div class="text-muted mb-3">작가 통계</div>
+      <div class="text-muted mb-3">작가 신청 통계</div>
       <div class="row text-center g-3">
         <div class="col-4">
-          <div class="fs-2 fw-bold">{{ rental_count }}</div>
-          <div class="small">그림렌탈</div>
+          <div class="fs-2 fw-bold">{{ total_applications }}</div>
+          <div class="small">전체 신청 건수</div>
         </div>
         <div class="col-4">
-          <div class="fs-2 fw-bold">{{ purchase_count }}</div>
-          <div class="small">그림구매</div>
+          <div class="fs-2 fw-bold">{{ approved_applications }}</div>
+          <div class="small">승인 건수</div>
         </div>
         <div class="col-4">
-          <div class="fs-2 fw-bold">{{ arttech_count }}</div>
-          <div class="small">아트테크</div>
+          <div class="fs-2 fw-bold">{{ rejected_applications }}</div>
+          <div class="small">반려 건수</div>
         </div>
       </div>
     </div>
