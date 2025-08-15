@@ -1,11 +1,36 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
 from artist.forms import ArtistApplicationForm
 from artist.models import ArtistApplication, ArtistProfile
+
+
+class ApprovedArtistRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = "accounts:login"
+    redirect_field_name = "next"
+
+    def test_func(self):
+        user = self.request.user
+        profile = getattr(user, "artistprofile", None)
+        return bool(profile and profile.is_approved)
+
+    def handle_no_permission(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            messages.warning(self.request, "로그인이 필요합니다.")
+            return super().handle_no_permission()
+
+        profile = getattr(user, "artistprofile", None)
+        if profile is None:
+            messages.warning(self.request, "등록된 작가만 접근할 수 있습니다.")
+            return redirect("core:main")
+
+        messages.error(self.request, "접근 권한이 없습니다.")
+        return redirect("core:main")
+
 
 class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
     template_name = "artist/apply.html"
