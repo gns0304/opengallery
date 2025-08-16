@@ -2,13 +2,13 @@
      data-bs-scroll="true">
     <div class="offcanvas-header">
         <h2 class="offcanvas-title h5 m-0" id="siteMenuLabel">메뉴</h2>
-        <button type="button" class="btn-close" aria-label="닫기"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="닫기"></button>
     </div>
 
     <div class="offcanvas-body d-flex flex-column">
         <ul class="list-unstyled mb-4">
             <li><a class="d-block py-2 link-dark fw-semibold" href="{% url 'core:main' %}">홈</a></li>
-            <li><a class="d-block py-2 link-dark" href="">작가목록</a></li>
+            <li><a class="d-block py-2 link-dark" href="{% url 'gallery:artist_list' %}">작가목록</a></li>
             <li><a class="d-block py-2 link-dark" href="{% url 'gallery:artwork_list' %}">작품목록</a></li>
             <li><a class="d-block py-2 link-dark" href="{% url 'artist:apply' %}">작가등록</a></li>
         </ul>
@@ -28,11 +28,11 @@
             {% if user.is_authenticated %}
                 <form action="{% url 'accounts:logout' %}" method="post" class="d-grid">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-dark w-100">로그아웃</button>
+                    <button type="submit" class="btn btn-outline-dark w-100 rounded-0">로그아웃</button>
                 </form>
             {% else %}
-                <a class="btn btn-outline-dark w-100" href="{% url 'accounts:login' %}">로그인</a>
-                <a class="btn btn-dark w-100" href="{% url 'accounts:signup' %}">회원가입</a>
+                <a class="btn btn-outline-dark w-100 rounded-0" href="{% url 'accounts:login' %}">로그인</a>
+                <a class="btn btn-dark w-100 rounded-0" href="{% url 'accounts:signup' %}">회원가입</a>
             {% endif %}
         </div>
     </div>
