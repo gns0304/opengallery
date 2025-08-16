@@ -1,0 +1,161 @@
+{% extends "common/layout/single_content.html" %}
+
+{% block title %} - 작품 목록{% endblock %}
+{% block page_title %}작품 목록{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block main %}
+
+    <form id="search-form" method="get" class="mb-3" role="search" novalidate>
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="input-group">
+                    <span class="input-group-text rounded-0">제목</span>
+                    <input class="form-control" type="text" name="title" value="{{ title }}" placeholder="작품 제목">
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text rounded-0">작품가</span>
+
+                    <input class="form-control" id="price-min-display" inputmode="numeric" placeholder="최소">
+                    <input type="hidden" id="price-min-input" name="price_min" value="{{ price_min }}">
+                    <span class="input-group-text">원</span>
+
+                    <span class="input-group-text">~</span>
+
+                    <input class="form-control" id="price-max-display" inputmode="numeric" placeholder="최대">
+                    <input type="hidden" id="price-max-input" name="price_max" value="{{ price_max }}">
+                    <span class="input-group-text rounded-0">원</span>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text rounded-0">사이즈</span>
+                    <input class="form-control" type="number" name="size_min" min="1" max="500" value="{{ size_min }}"
+                           placeholder="최소 1호">
+                    <span class="input-group-text">호</span>
+                    <span class="input-group-text">~</span>
+                    <input class="form-control" type="number" name="size_max" min="1" max="500" value="{{ size_max }}"
+                           placeholder="최대 500호">
+                    <span class="input-group-text rounded-0">호</span>
+                </div>
+            </div>
+        </div>
+    <div class="d-flex justify-content-end mt-4 mb-4">
+        <div class="btn-group" role="group" aria-label="검색 및 초기화">
+            <button class="btn btn-dark rounded-0" type="submit">
+                <i class="bi bi-search me-1"></i>검색
+            </button>
+            <a class="btn btn-outline-secondary rounded-0" href="{{ request.path }}">초기화</a>
+        </div>
+    </div>
+    </form>
+
+    {% if artworks %}
+        <div class="row g-3">
+            {% for art in artworks %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card h-100 border-1 rounded-0">
+                        <div class="ratio ratio-4x3 overflow-hidden border-bottom">
+                            {% if art.image %}
+                                <img src="{{ art.image.url }}" class="w-100 h-100 object-cover" alt="{{ art.title }}">
+                            {% else %}
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                    <span class="text-muted small">이미지 없음</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="fw-semibold text-truncate" title="{{ art.title }}">{{ art.title }}</div>
+                            <div class="text-muted small mt-1"><span>{{ art.size }}호</span></div>
+                            <div class="text-muted small mt-1">
+                                작품가 <span class="price-commas" data-price="{{ art.price }}">{{ art.price }}</span>원
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-muted">조건에 일치하는 작품이 없습니다.</div>
+    {% endif %}
+
+    {% if is_paginated %}
+        <nav aria-label="Page navigation" class="my-4">
+            <ul class="pagination justify-content-center pagination-sm">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link text-dark"
+                           href="?page={{ page_obj.previous_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                            이전
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link text-dark">이전</span></li>
+                {% endif %}
+
+                {% for num in page_range %}
+                    {% if num == page_obj.paginator.ELLIPSIS %}
+                        <li class="page-item disabled"><span class="page-link text-dark">&hellip;</span></li>
+                    {% elif num == page_obj.number %}
+                        <li class="page-item active"><span class="page-link bg-dark border-dark">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link text-dark"
+                               href="?page={{ num }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link text-dark"
+                           href="?page={{ page_obj.next_page_number }}{% if preserved_query %}&{{ preserved_query }}{% endif %}">
+                            다음
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link text-dark">다음</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+    <script>
+        (function () {
+            function priceFieldComma(displayId, realId) {
+                const display = document.getElementById(displayId);
+                const real = document.getElementById(realId);
+
+                function setInitial() {
+                    if (!display || !real) return;
+                    const n = parseInt(real.value, 10);
+                    display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
+                }
+
+                function syncFromDisplay() {
+                    const digits = (display.value || '').replace(/[^\d]/g, '');
+                    if (digits.length) {
+                        const n = parseInt(digits, 10);
+                        display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
+                        real.value = Number.isFinite(n) ? n : '';
+                    } else {
+                        display.value = '';
+                        real.value = '';
+                    }
+                }
+
+                if (display && real) {
+                    setInitial();
+                    display.addEventListener('input', syncFromDisplay);
+                    display.addEventListener('blur', syncFromDisplay);
+                    display.form && display.form.addEventListener('submit', syncFromDisplay);
+                }
+            }
+
+            priceFieldComma('price-min-display', 'price-min-input');
+            priceFieldComma('price-max-display', 'price-max-input');
+        })();
+    </script>
+
+{% endblock %}
