@@ -124,38 +124,71 @@
     <script>
         (function () {
             function priceFieldComma(displayId, realId) {
-                const display = document.getElementById(displayId);
-                const real = document.getElementById(realId);
+                const displayElement = document.getElementById(displayId);
+                const realElement = document.getElementById(realId);
 
                 function setInitial() {
-                    if (!display || !real) return;
-                    const n = parseInt(real.value, 10);
-                    display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
+                    if (!displayElement || !realElement) return;
+                    const numberValue = parseInt(realElement.value, 10);
+                    displayElement.value = Number.isFinite(numberValue) ? numberValue.toLocaleString('ko-KR') : '';
                 }
 
                 function syncFromDisplay() {
-                    const digits = (display.value || '').replace(/[^\d]/g, '');
+                    const digits = (displayElement.value || '').replace(/[^\d]/g, '');
                     if (digits.length) {
-                        const n = parseInt(digits, 10);
-                        display.value = Number.isFinite(n) ? n.toLocaleString('ko-KR') : '';
-                        real.value = Number.isFinite(n) ? n : '';
+                        const numberValue = parseInt(digits, 10);
+                        displayElement.value = Number.isFinite(numberValue) ? numberValue.toLocaleString('ko-KR') : '';
+                        realElement.value = Number.isFinite(numberValue) ? numberValue : '';
                     } else {
-                        display.value = '';
-                        real.value = '';
+                        displayElement.value = '';
+                        realElement.value = '';
                     }
                 }
 
-                if (display && real) {
+                if (displayElement && realElement) {
                     setInitial();
-                    display.addEventListener('input', syncFromDisplay);
-                    display.addEventListener('blur', syncFromDisplay);
-                    display.form && display.form.addEventListener('submit', syncFromDisplay);
+                    displayElement.addEventListener('input', syncFromDisplay);
+                    displayElement.addEventListener('blur', syncFromDisplay);
+                    displayElement.form && displayElement.form.addEventListener('submit', syncFromDisplay);
                 }
             }
 
             priceFieldComma('price-min-display', 'price-min-input');
             priceFieldComma('price-max-display', 'price-max-input');
+
+            const formElement = document.getElementById('search-form');
+            if (formElement) {
+                formElement.addEventListener('submit', function (event) {
+                    const priceMinElement = document.getElementById('price-min-input');
+                    const priceMaxElement = document.getElementById('price-max-input');
+                    const priceMinValue = priceMinElement && priceMinElement.value !== '' ? parseInt(priceMinElement.value, 10) : null;
+                    const priceMaxValue = priceMaxElement && priceMaxElement.value !== '' ? parseInt(priceMaxElement.value, 10) : null;
+
+                    if (priceMinValue !== null && priceMaxValue !== null && Number.isFinite(priceMinValue) && Number.isFinite(priceMaxValue)) {
+                        if (priceMaxValue < priceMinValue) {
+                            alert('작품가 최대값은 최소값보다 크거나 같아야 합니다.');
+                            const displayMaxElement = document.getElementById('price-max-display');
+                            displayMaxElement && displayMaxElement.focus();
+                            event.preventDefault();
+                            return;
+                        }
+                    }
+
+                    const sizeMinElement = formElement.querySelector('input[name="size_min"]');
+                    const sizeMaxElement = formElement.querySelector('input[name="size_max"]');
+                    const sizeMinValue = sizeMinElement && sizeMinElement.value !== '' ? parseInt(sizeMinElement.value, 10) : null;
+                    const sizeMaxValue = sizeMaxElement && sizeMaxElement.value !== '' ? parseInt(sizeMaxElement.value, 10) : null;
+
+                    if (sizeMinValue !== null && sizeMaxValue !== null && Number.isFinite(sizeMinValue) && Number.isFinite(sizeMaxValue)) {
+                        if (sizeMaxValue < sizeMinValue) {
+                            alert('사이즈 최대값은 최소값보다 크거나 같아야 합니다.');
+                            sizeMaxElement && sizeMaxElement.focus();
+                            event.preventDefault();
+                            return;
+                        }
+                    }
+                });
+            }
         })();
     </script>
-
 {% endblock %}
