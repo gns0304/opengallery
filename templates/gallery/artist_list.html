@@ -6,7 +6,7 @@
 
 {% block main %}
 
-<form method="get" class="mb-3" role="search" novalidate>
+<form id="artist-search-form" method="get" class="mb-3" role="search" novalidate>
   <div class="row g-2">
     <div class="col-12">
       <div class="input-group">
@@ -29,7 +29,7 @@
     <div class="col-12 col-md-6">
       <div class="input-group">
         <span class="input-group-text rounded-0">생년월일</span>
-        <input class="form-control" type="date" name="birth_date" value="{{ birth_date }}" placeholder="YYYY-MM-DD">
+        <input class="form-control" type="date" name="birth_date" value="{{ birth_date }}" placeholder="YYYY-MM-DD" min="1900-01-01" max="{{ today|date:'Y-m-d' }}">
       </div>
     </div>
 
@@ -130,3 +130,4 @@
   </nav>
 {% endif %}
 {% endblock %}
+
