@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import opengallery.env as env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f@3r(9xb@$&*33c0@-x&pl5!6&a@+!(1nsjiohc^$dkdaxy$ai'
+SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not env.PRODUCTION
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = env.ALLOWED_HOSTS
 
 # Application definition
 
@@ -47,12 +47,15 @@ INTERNAL_APPS = [
     'gallery.apps.GalleryConfig',
 ]
 
-EXTERNAL_APPS = []
+EXTERNAL_APPS = [
+    'storages',
+]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware"
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,13 +88,24 @@ WSGI_APPLICATION = 'opengallery.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if env.USE_CUSTOM_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': env.CUSTOM_DB_ENGINE,
+            'NAME': env.CUSTOM_DB_NAME,
+            'USER': env.CUSTOM_DB_USER,
+            'PASSWORD': env.CUSTOM_DB_PASSWORD,
+            'HOST': env.CUSTOM_DB_HOST,
+            'PORT': env.CUSTOM_DB_PORT,
+        }
     }
-}
-
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -127,22 +141,43 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if env.USE_S3_MEDIA:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    AWS_S3_ACCESS_KEY_ID = env.AWS_S3_ACCESS_KEY_ID
+    AWS_S3_SECRET_ACCESS_KEY = env.AWS_S3_SECRET_ACCESS_KEY
+    AWS_S3_REGION_NAME = env.AWS_S3_REGION_NAME
+    AWS_S3_ADDRESSING_STYLE = env.AWS_S3_ADDRESSING_STYLE
+    AWS_S3_SIGNATURE_VERSION = env.AWS_S3_SIGNATURE_VERSION
+    AWS_STORAGE_BUCKET_NAME = env.AWS_STORAGE_BUCKET_NAME
+    AWS_S3_CUSTOM_DOMAIN = env.AWS_S3_CUSTOM_DOMAIN
 
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/"
+    STORAGES = {
+            "default": {
+                "BACKEND": "opengallery.storages.MediaStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication settings
+
 AUTH_USER_MODEL = "accounts.User"
+
 LOGIN_URL = "accounts/login"
-LOGIN_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = '/'
