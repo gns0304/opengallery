@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# venv
+venv/
+.env
+
+# Django artifacts
+*.sqlite3
+
+# Static/Media
+media/
+static/
+staticfiles/
+
+# 기타
+*.log
