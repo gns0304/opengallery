@@ -9,6 +9,7 @@ def as_bool(val, default=False):
 PRODUCTION = as_bool(getenv('PRODUCTION', False))
 
 ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', '*').split(',')
+CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', '*').split(',')
 
 # Secret Environment
 SECRET_KEY = getenv('SECRET_KEY', 'django-insecure-f@3r(9xb@$&*33c0@-x&pl5!6&a@+!(1nsjiohc^$dkdaxy$ai')
