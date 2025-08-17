@@ -22,6 +22,7 @@ CUSTOM_DB_USER = getenv("PGUSER")
 CUSTOM_DB_PASSWORD = getenv("PGPASSWORD")
 CUSTOM_DB_HOST = getenv("PGHOST")
 CUSTOM_DB_PORT = getenv("PGPORT")
+CUSTOM_DB_SSLMODE  = getenv("DB_SSLMODE", "require")
 
 # Media Config
 
