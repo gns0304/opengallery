@@ -55,7 +55,7 @@ INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware"
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -97,6 +97,8 @@ if env.USE_CUSTOM_DB:
             'PASSWORD': env.CUSTOM_DB_PASSWORD,
             'HOST': env.CUSTOM_DB_HOST,
             'PORT': env.CUSTOM_DB_PORT,
+            'OPTIONS': {
+                'sslmode': env.CUSTOM_DB_SSLMODE}
         }
     }
 else:

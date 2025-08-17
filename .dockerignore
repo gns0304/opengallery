@@ -12,8 +12,6 @@ venv/
 
 # Static/Media
 media/
-static/
-staticfiles/
 
 # 기타
 *.log
