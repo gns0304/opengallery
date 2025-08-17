@@ -4,7 +4,7 @@ from django.utils.http import urlencode
 from .models import Artwork
 from artist.models import ArtistProfile
 from datetime import datetime
-from django.contrib import messages
+from django.utils import timezone
 
 class ArtworkListView(ListView):
     model = Artwork
@@ -157,6 +157,7 @@ class ArtistListView(ListView):
                 "birth_date": birth_date,
                 "email": email,
                 "phone": phone,
+                "today": timezone.now().date(),
             })
 
             page_obj = context.get("page_obj")
