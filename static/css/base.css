@@ -135,3 +135,15 @@ body {
   background-color: #212529 !important;
   color: #fff !important;
 }
+
+/* ----------------------------------
+   Main Page Carousel
+---------------------------------- */
+
+.carousel-caption {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3.5rem;
+  background: rgba(0, 0, 0, 0.3);
+}
