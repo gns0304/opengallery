@@ -52,13 +52,13 @@ class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
         profile = ArtistProfile.objects.filter(user=request.user, is_approved=True).first()
         if profile:
             messages.info(request, "이미 승인된 작가 계정입니다.")
-            return redirect("core:main")
+            return redirect("artist:dashboard")
 
         pending_exists = ArtistApplication.objects.filter(
             applicant=request.user, status__in=["PENDING", "ERROR", "PROCESSING"]
         ).exists()
         if pending_exists and request.method.lower() == "get":
-            messages.info(request, "기접수된 작가 등록 신청이 있습니다.")
+            messages.info(request, "기접수된 작가 등록 신청이 있습니다. 승인 결과를 기다려주세요.")
             return redirect("core:main")
 
         return super().dispatch(request, *args, **kwargs)
@@ -69,7 +69,7 @@ class ArtistApplicationCreateView(LoginRequiredMixin, CreateView):
         if ArtistApplication.objects.filter(
             applicant=self.request.user, status="PENDING"
         ).exists():
-            messages.warning(self.request, "이미 대기 중인 신청이 있습니다.")
+            messages.warning(self.request, "기접수된 작가 등록 신청이 있습니다. 승인 결과를 기다려주세요.")
             return redirect("core:main")
 
         messages.success(self.request, "작가 등록 신청이 접수되었어요. 승인 결과를 기다려주세요.")
