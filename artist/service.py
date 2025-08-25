@@ -77,13 +77,13 @@ def process_multiple_reject(application_ids, admin_user):
 
     with transaction.atomic():
         applications = (ArtistApplication.objects.select_for_update().filter(pk__in=application_ids,
-                                                                             status__in=["PENDING", "ERROR"]))
-    processed = list(applications.values_list('id', flat=True))
-    applications.update(
-        status="REJECTED",
-        processed_by=admin_user,
-        processed_at=timezone.now(),
-    )
+                                                                                 status__in=["PENDING", "ERROR"]))
+        processed = list(applications.values_list('id', flat=True))
+        applications.update(
+            status="REJECTED",
+            processed_by=admin_user,
+            processed_at=timezone.now(),
+        )
 
     result.rejected.extend(processed)
     result.skipped.extend(set(application_ids) - set(processed))
